@@ -1,14 +1,7 @@
-Jessica
+btsnoop
 =======
 
-Parrot minidrone Rolling Spider
+Python parsing for BtSnoop packet capture files
 
-* autonomous minidrone controlled via Python
-
-![Jessica MiniDrone](http://robotika.cz/robots/jessica/jessica.jpg)
-
-References at
-http://robotika.cz/robots/jessica/
-
-The first spin video
-https://www.youtube.com/watch?v=4jyffZZ1At0
+- http://tools.ietf.org/html/rfc1761
+- http://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
