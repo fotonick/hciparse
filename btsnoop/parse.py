@@ -20,6 +20,12 @@ def print_hdr():
     print ""
 
 def main(filename):
+    records = parse_file(filename)
+    for record in records:
+        print record
+    return 0
+
+def parse_file(filename):
     """ 
     Btsnoop packet capture file is structured as:
     
@@ -38,20 +44,35 @@ def main(filename):
     References can be found here:
     * http://tools.ietf.org/html/rfc1761
     * http://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
+
+    Return a list of records, each holding:
+    * sequence nbr
+    * record length (in bytes)
+    * flags
+    * timestamp
+    * data
     """
     with open(filename, "rb") as f:
     
         # Validate file header
-        (identification, version, type) = read_file_header(f)
-        validate_file_header(identification, version, type)
+        (identification, version, type) = _read_file_header(f)
+        _validate_file_header(identification, version, type)
         
         # Read packet records
-        records = [ record for record in read_packet_records(f) ]
-        for seq, flags, time in map(lambda record: (record[0], parse_flags(record[3]), record[5]), records):
-            print parse_time(time)
-            #print "{0}\t{1:10} -> {2:10}\t{3}".format(seq, flags["src"], flags["dst"], flags["type"])
+        records = [ record for record in _read_packet_records(f) ]
 
-def read_file_header(f):
+        # Parse the stuff we know at this time:
+        # * sequence nbr
+        # * record length (in bytes)
+        # * flags
+        # * timestamp
+        # * data
+        return map(lambda record: 
+            (record[0], record[2], _parse_flags(record[3]), _parse_time(record[5]), record[6]),
+            records)
+
+
+def _read_file_header(f):
     """
     Header should conform to the following format
     
@@ -70,7 +91,7 @@ def read_file_header(f):
     version, data_link_type = struct.unpack( ">II", f.read(4 + 4) )
     return (ident, version, data_link_type)
     
-def validate_file_header(identification, version, data_link_type):
+def _validate_file_header(identification, version, data_link_type):
     """
     The identification pattern should be:
         'btsnoop\0' 
@@ -94,7 +115,7 @@ def validate_file_header(identification, version, data_link_type):
     assert data_link_type == 1002
     print "Btsnoop capture file version {0}, type {1}".format(version, data_link_type)
     
-def read_packet_records(f):
+def _read_packet_records(f):
     """
     A record should confirm to the following format
     
@@ -135,7 +156,7 @@ def read_packet_records(f):
         seq_nbr += 1
 
         
-def parse_flags(flags):
+def _parse_flags(flags):
     """
     Record flags conform to:
         - bit 0         0 = sent, 1 = received
@@ -155,7 +176,7 @@ def parse_flags(flags):
     else:
         return { "src": "controller", "dst": "host", "type": "event" }
     
-def parse_time(t):
+def _parse_time(time):
     """
     Record time is a 64-bit signed integer representing the time of packet arrival, 
     in microseconds since midnight, January 1st, 0 AD nominal Gregorian.
@@ -164,55 +185,10 @@ def parse_time(t):
     epoch may be used of midnight, January 1st 2000 AD, which is represented in 
     this field as 0x00E03AB44A676000.
     """
-    t_since_2000_epoch = datetime.timedelta(microseconds=t) - datetime.timedelta(microseconds=int("0x00E03AB44A676000", 16))
-    return datetime.datetime(2000, 1, 1) + t_since_2000_epoch
-        
-def parseBTSnoop( f ):
-    i = 0
-    startTime = None
-    while True:
-        header = f.read(4*6)
-        if len(header) < 24:
-            break
-        origLen, incLen, flags, drops, time64 = struct.unpack( 
-                ">IIIIq", header )
-        assert origLen == incLen, (origLen, incLen)
-        assert drops == 0, drops
-        assert flags in [0,1,2,3], (i,flags)
-        # bit 0 ... 0 = sent, 1 = received
-        # bit 1 ... 0 = data, 1 = command/event
-        if startTime is None:
-            startTime = time64
-        data = f.read(origLen)
-        assert len(data) == origLen, (len(data), origLen)
-        if flags == 0:
-            tmp = [ord(x) for x in data]
-            t = ((time64-startTime)/1000)/1000.
-            print "%.03f" % t, hexStr( tmp )
-            assert tmp[:3] == [0x2, 0x40, 0x00,]
-            # well tmp[3] it is the lengh of data (maybe 16bit?)
-            assert len(tmp)-5 == tmp[3], (len(tmp), tmp[3])
-            assert tmp[4] == 0, tmp[4]
-            assert len(tmp)-9 == tmp[5], (len(tmp), tmp[5])
-            assert tmp[6] == 0, tmp[6]
-            #print flags, ((time64-startTime)/1000)/1000.
-            #print [hex(x) for x in tmp[5:]]
-            if tmp[5] == 0x12:
-                # looks like it is similar to AR Drone2 AT*PCMD
-                assert tmp[5:5+8] == [0x12, 0x0, 0x4, 0x0, 0x52, 0x40, 0x0, 0x2], tmp[5:5+8]
-                # BHH unknown, B=on/off, forward/backward, tilt left/right, turn right/left, up/down, f multiply?
-                # all signed byte values are in interval -100..100
-                print struct.unpack("=BHHBbbbbf", data[5+8:]) 
-        elif flags == 1:
-            print "In:", [hex(ord(x)) for x in data]
-        else:
-            print "%d:"%flags, hexStr( [ord(x) for x in data] )
-        i += 1
-    print "Records", i
+    time_betw_0_and_2000_ad = int("0x00E03AB44A676000", 16)
+    time_since_2000_epoch = datetime.timedelta(microseconds=time) - datetime.timedelta(microseconds=time_betw_0_and_2000_ad)
+    return datetime.datetime(2000, 1, 1) + time_since_2000_epoch
 
-def hexStr( arr ):
-    "hexdump of byte array"
-    return " ".join( ["%02X" % x for x in arr] )
     
 if __name__ == "__main__":
     if len(sys.argv) < 2:
