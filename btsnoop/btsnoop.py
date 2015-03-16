@@ -7,26 +7,11 @@ import datetime
 import sys
 import struct
 
-def print_hdr():
-    """
-    Print the script header
-    """
-    print ""
-    print "##############################"
-    print "#                            #"
-    print "#    btsnoop parser v0.1     #"
-    print "#                            #"
-    print "##############################"
-    print ""
 
-def main(filename):
-    records = parse_file(filename)
-    for record in records:
-        print record
-    return 0
-
-def parse_file(filename):
+def parse(filename):
     """ 
+    Parse a Btsnoop packet capture file.
+
     Btsnoop packet capture file is structured as:
     
     -----------------------
@@ -90,7 +75,8 @@ def _read_file_header(f):
     ident = f.read(8)
     version, data_link_type = struct.unpack( ">II", f.read(4 + 4) )
     return (ident, version, data_link_type)
-    
+
+
 def _validate_file_header(identification, version, data_link_type):
     """
     The identification pattern should be:
@@ -114,7 +100,8 @@ def _validate_file_header(identification, version, data_link_type):
     assert version == 1
     assert data_link_type == 1002
     print "Btsnoop capture file version {0}, type {1}".format(version, data_link_type)
-    
+
+
 def _read_packet_records(f):
     """
     A record should confirm to the following format
@@ -155,7 +142,7 @@ def _read_packet_records(f):
         yield ( seq_nbr, orig_len, inc_len, flags, drops, time64, data )
         seq_nbr += 1
 
-        
+
 def _parse_flags(flags):
     """
     Record flags conform to:
@@ -175,7 +162,8 @@ def _parse_flags(flags):
         return { "src": "host", "dst": "controller", "type": "command" }
     else:
         return { "src": "controller", "dst": "host", "type": "event" }
-    
+
+
 def _parse_time(time):
     """
     Record time is a 64-bit signed integer representing the time of packet arrival, 
@@ -188,6 +176,25 @@ def _parse_time(time):
     time_betw_0_and_2000_ad = int("0x00E03AB44A676000", 16)
     time_since_2000_epoch = datetime.timedelta(microseconds=time) - datetime.timedelta(microseconds=time_betw_0_and_2000_ad)
     return datetime.datetime(2000, 1, 1) + time_since_2000_epoch
+
+
+def print_hdr():
+    """
+    Print the script header
+    """
+    print ""
+    print "##############################"
+    print "#                            #"
+    print "#    btsnoop parser v0.1     #"
+    print "#                            #"
+    print "##############################"
+    print ""
+
+
+def main(filename):
+    records = parse(filename)
+    print records
+    return 0
 
     
 if __name__ == "__main__":
