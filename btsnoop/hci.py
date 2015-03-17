@@ -10,6 +10,7 @@
 import sys
 import struct
 from hci_cmd import HCI_COMMANDS
+from hci_evt import HCI_EVENTS
 
 
 def parse_cmd(data):
@@ -64,16 +65,16 @@ def parse_evt(data):
     ** [vol 2] Part E (Section 5) - HCI Data Formats
     ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
 
+    All integer values are stored in "little-endian" order.
     """
-    bytes = [ord(x) for x in data]
-    return bytes
+    evtcode = struct.unpack("<B", data[:1])[0]
+    return HCI_EVENTS[evtcode]
 
 
 PKT_TYPE_PARSERS = {"HCI_CMD": parse_cmd,
                     "ACL_DATA": parse_acl,
                     "ACL_SYNC_DATA": parse_sync_acl,
-                    "HCI_EVT": parse_evt
-                    }
+                    "HCI_EVT": parse_evt}
 
 
 def parse(hci_pkt_type, data):
