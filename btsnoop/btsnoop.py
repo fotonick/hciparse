@@ -71,6 +71,8 @@ def _read_file_header(f):
     | data link type = HCI UART (H4)       |
     | 4 bytes                              |
     ----------------------------------------
+
+    All integer values are stored in "big-endian" order, with the high-order bits first.
     """
     ident = f.read(8)
     version, data_link_type = struct.unpack( ">II", f.read(4 + 4) )
@@ -125,6 +127,7 @@ def _read_packet_records(f):
     | packet data            |
     --------------------------
     
+    All integer values are stored in "big-endian" order, with the high-order bits first.
     """
     seq_nbr = 1
     while True:

@@ -1,5 +1,5 @@
 """
-  Parse hci information from binary string
+  Parse hci uart information from binary string
   usage:
      ./hci_uart.py <data string>
 """
@@ -29,11 +29,10 @@ def parse(data):
     * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
     ** [vol 4] Part A (Section 2) Protocol
 
-    Returns a list of all bytes in the data string, with the HCI type (the first byte) identified and
-    converted to a string.
+    Returns a tuple with the HCI type (the first byte) identified and
+    converted to a string followed by the rest of the data.
     """
-    bytes = [ord (b) for b in data]
-    return [ _parse_type(b) if i == 0 else b for i,b in enumerate(bytes)]
+    return ( _parse_type(ord(data[0])), data[1:] )
 
 def _parse_type(type):
     """
@@ -57,7 +56,7 @@ def print_hdr():
     print ""
     print "##############################"
     print "#                            #"
-    print "#    hci parser v0.1         #"
+    print "#    hci uart parser v0.1    #"
     print "#                            #"
     print "##############################"
     print ""
