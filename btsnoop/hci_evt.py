@@ -1,4 +1,4 @@
-""",
+"""
 Event codes and names for HCI events according to the Bluetooth specification
 
 Event code is 1 byte.
@@ -7,7 +7,7 @@ Event code is 1 byte.
 -----------------
 |   event code  |
 -----------------
-""",
+"""
 HCI_EVENTS = {
             0x01 : "EVENT Inquiry_Complete",
             0x02 : "EVENT Inquiry_Result",
