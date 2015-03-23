@@ -1,12 +1,56 @@
 """
-Event codes and names for HCI events according to the Bluetooth specification
+Event codes and names for HCI events
 
 Event code is 1 byte.
 
- 0 1 2 3 4 5 6 7 
------------------
-|   event code  |
------------------
+ 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+---------------------------------
+|   event code  |    length     |
+---------------------------------
+
+However, LE Meta events adds additional data that needs to be handled.
+
+LE_META_EVENT:
+
+ 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+-------------------------------------------------
+|   event code  |    length     | subevent code |
+-------------------------------------------------
+"""
+
+
+"""
+The HCI LE Meta Event is used to encapsulate all LE Controller specific events.
+The Event Code of all LE Meta Events shall be 0x3E. The Subevent_Code is
+the first octet of the event parameters. The Subevent_Code shall be set to one
+of the valid Subevent_Codes from an LE specific event
+"""
+HCI_LE_META_EVENT = 0x3e;
+
+
+"""
+HCI LE Meta events
+
+References can be found here:
+* https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
+** [vol 2] Part E (Section 7.7.65) - Le Meta Event
+"""
+HCI_LE_META_EVENTS = {
+            0x01 : "EVENT LE_Connection_Complete",
+            0x02 : "EVENT LE_Advertising_Report",
+            0x03 : "EVENT LE_Connection_Update_Complete",
+            0x04 : "EVENT LE_Read_Remote_Used_Features_Complete",
+            0x05 : "EVENT LE_Long_Term_Key_Request",
+            0x06 : "EVENT LE_Remote_Connection_Parameter_Request"
+        }
+
+
+"""
+HCI Event codes
+
+References can be found here:
+* https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
+** [vol 2] Part E (Section 7.7) - Events
 """
 HCI_EVENTS = {
             0x01 : "EVENT Inquiry_Complete",
@@ -59,6 +103,7 @@ HCI_EVENTS = {
             0x3b : "EVENT User_Passkey_Notification",
             0x3c : "EVENT Keypress_Notification",
             0x3d : "EVENT Remote_Host_Supported_Features_Notification",
+            HCI_LE_META_EVENT : "EVENT LE_Meta_Event",
             0x40 : "EVENT Physical_Link_Complete",
             0x41 : "EVENT Channel_Selected",
             0x42 : "EVENT Disconnection_Physical_Link_Complete",
@@ -73,7 +118,6 @@ HCI_EVENTS = {
             0x49 : "EVENT AMP_Start_Test",
             0x4a : "EVENT AMP_Test_End",
             0x4b : "EVENT AMP_Receiver_Report",
-            0x3e : "EVENT LE_Meta_Event",
             0x4e : "EVENT Triggered_Clock_Capture",
             0x4f : "EVENT Synchronization_Train_Complete",
             0x50 : "EVENT Synchronization_Train_Received",
