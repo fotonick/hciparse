@@ -26,7 +26,7 @@ def parse_cmd(data):
 
     All integer values are stored in "little-endian" order.
     """
-    opcode = struct.unpack("<H", data[:2])[0]
+    opcode, length = struct.unpack("<HB", data[:3])
     return HCI_COMMANDS[opcode]
 
 
