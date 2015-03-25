@@ -3,6 +3,7 @@
 """
 import struct
 
+
 """
 Event codes and names for HCI events
 

@@ -8,6 +8,23 @@ import sys
 import struct
 
 
+"""
+Record flags conform to:
+    - bit 0         0 = sent, 1 = received
+    - bit 1         0 = data, 1 = command/event
+    - bit 2-31      reserved
+
+Direction is relative to host / DTE. i.e. for Bluetooth controllers,
+Send is Host->Controller, Receive is Controller->Host
+"""
+BTSNOOP_FLAGS = {
+    0 : ("host", "controller", "data"),
+    1 : ("controller", "host", "data"),
+    2 : ("host", "controller", "command"),
+    3 : ("controller", "host", "event")
+}
+
+
 def parse(filename):
     """ 
     Parse a Btsnoop packet capture file.
@@ -42,9 +59,6 @@ def parse(filename):
         # Validate file header
         (identification, version, type) = _read_file_header(f)
         _validate_file_header(identification, version, type)
-        
-        # Read packet records
-        records = [ record for record in _read_packet_records(f) ]
 
         # Parse the stuff we know at this time:
         # * sequence nbr
@@ -54,7 +68,7 @@ def parse(filename):
         # * data
         return map(lambda record: 
             (record[0], record[2], _parse_flags(record[3]), _parse_time(record[5]), record[6]),
-            records)
+            _read_packet_records(f))
 
 
 def _read_file_header(f):
@@ -148,23 +162,10 @@ def _read_packet_records(f):
 
 def _parse_flags(flags):
     """
-    Record flags conform to:
-        - bit 0         0 = sent, 1 = received
-        - bit 1         0 = data, 1 = command/event
-        - bit 2-31      reserved
-        
-    Direction is relative to host / DTE. i.e. for Bluetooth controllers, 
-    Send is Host->Controller, Receive is Controller->Host
+    Returns a tuple of (src, dst, type)
     """
     assert flags in [0,1,2,3]
-    if flags == 0:
-        return { "src": "host",  "dst": "controller", "type": "data" }
-    elif flags == 1:
-        return { "src": "controller", "dst": "host", "type": "data" }
-    elif flags == 2:
-        return { "src": "host", "dst": "controller", "type": "command" }
-    else:
-        return { "src": "controller", "dst": "host", "type": "event" }
+    return BTSNOOP_FLAGS[flags]
 
 
 def _parse_time(time):

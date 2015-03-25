@@ -3,6 +3,7 @@
 """
 import struct
 
+
 """
 OpCodes and names for HCI commands according to the Bluetooth specification
 
