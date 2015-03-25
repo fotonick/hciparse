@@ -157,4 +157,5 @@ def parse_evt(data):
         return evtcode, length, data[2:]
     else:
         subevtcode = struct.unpack("<B", data[2:3])[0]
+        length -= 1 # Subtrackt length of SubEvent code
         return evtcode, length, subevtcode, data[3:]
