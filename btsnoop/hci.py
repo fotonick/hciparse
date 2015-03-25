@@ -9,25 +9,8 @@
 """
 import sys
 import struct
-from hci_cmd import HCI_COMMANDS
-from hci_evt import HCI_EVENTS
-from hci_evt import HCI_LE_META_EVENT
-from hci_evt import HCI_LE_META_EVENTS
-
-
-def parse_cmd(data):
-    """
-    Parse HCI command
-
-    References can be found here:
-    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
-    ** [vol 2] Part E (Section 5) - HCI Data Formats
-    ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
-
-    All integer values are stored in "little-endian" order.
-    """
-    opcode, length = struct.unpack("<HB", data[:3])
-    return HCI_COMMANDS[opcode]
+import hci_cmd
+import hci_evt
 
 
 def parse_acl(data):
@@ -58,31 +41,10 @@ def parse_sync_acl(data):
     return bytes
 
 
-def parse_evt(data):
-    """
-    Parse HCI event data
-
-    References can be found here:
-    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
-    ** [vol 2] Part E (Section 5) - HCI Data Formats
-    ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
-    ** [vol 2] Part E (Section 7.7) - Events
-    ** [vol 2] Part E (Section 7.7.65) - Le Meta Event
-
-    All integer values are stored in "little-endian" order.
-    """
-    evtcode, length = struct.unpack("<BB", data[:2])
-    if evtcode != HCI_LE_META_EVENT:
-        return HCI_EVENTS[evtcode]
-    else:
-        subevtcode = struct.unpack("<B", data[2:3])[0]
-        return HCI_LE_META_EVENTS[subevtcode]
-
-
-PKT_TYPE_PARSERS = {"HCI_CMD": parse_cmd,
+PKT_TYPE_PARSERS = {"HCI_CMD": hci_cmd.parse_cmd,
                     "ACL_DATA": parse_acl,
                     "ACL_SYNC_DATA": parse_sync_acl,
-                    "HCI_EVT": parse_evt}
+                    "HCI_EVT": hci_evt.parse_evt}
 
 
 def parse(hci_pkt_type, data):

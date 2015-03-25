@@ -1,4 +1,9 @@
 """
+  Parse hci events
+"""
+import struct
+
+"""
 Event codes and names for HCI events
 
 Event code is 1 byte.
@@ -129,3 +134,27 @@ HCI_EVENTS = {
             0x56 : "EVENT Inquiry_Response_Notification",
             0x57 : "EVENT Authenticated_Payload_Timeout_Expired",
         }
+
+
+def parse_evt(data):
+    """
+    Parse HCI event data
+
+    References can be found here:
+    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
+    ** [vol 2] Part E (Section 5) - HCI Data Formats
+    ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
+    ** [vol 2] Part E (Section 7.7) - Events
+    ** [vol 2] Part E (Section 7.7.65) - Le Meta Event
+
+    All integer values are stored in "little-endian" order.
+
+    Returns a tuple of (evtcode, length, subevtcode, data) if LE_Meta_Event,
+    else (evtcode, length, data)
+    """
+    evtcode, length = struct.unpack("<BB", data[:2])
+    if evtcode != HCI_LE_META_EVENT:
+        return evtcode, length, data[2:]
+    else:
+        subevtcode = struct.unpack("<B", data[2:3])[0]
+        return evtcode, length, subevtcode, data[3:]

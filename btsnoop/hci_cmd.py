@@ -1,4 +1,9 @@
 """
+  Parse hci commands
+"""
+import struct
+
+"""
 OpCodes and names for HCI commands according to the Bluetooth specification
 
 OpCode is 2 bytes, of which OGF is the upper 6 bits and OCF is the lower 10 bits.
@@ -254,3 +259,20 @@ HCI_COMMANDS = {
             0xfd58 : "COMND VSC_BLE_TRACK_ADV",
             0xfd59 : "COMND VSC_BLE_ENERGY_INFO"
         }
+
+def parse_cmd(data):
+    """
+    Parse HCI command
+
+    References can be found here:
+    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
+    ** [vol 2] Part E (Section 5) - HCI Data Formats
+    ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
+
+    All integer values are stored in "little-endian" order.
+
+    Returns a tuple of (opcode, length, data)
+    """
+    opcode, length = struct.unpack("<HB", data[:3])
+    data = data[3:]
+    return opcode, length, data
