@@ -11,39 +11,12 @@ import sys
 import struct
 import hci_cmd
 import hci_evt
-
-
-def parse_acl(data):
-    """
-    Parse HCI ACL data
-
-    References can be found here:
-    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
-    ** [vol 2] Part E (Section 5) - HCI Data Formats
-    ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
-
-    """
-    bytes = [ord(x) for x in data]
-    return bytes
-
-
-def parse_sync_acl(data):
-    """
-    Parse HCI synchronous ACL data
-
-    References can be found here:
-    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
-    ** [vol 2] Part E (Section 5) - HCI Data Formats
-    ** [vol 2] Part E (Section 5.4) - Exchange of HCI-specific information
-
-    """
-    bytes = [ord(x) for x in data]
-    return bytes
+import hci_acl
 
 
 PKT_TYPE_PARSERS = {"HCI_CMD": hci_cmd.parse_cmd,
-                    "ACL_DATA": parse_acl,
-                    "ACL_SYNC_DATA": parse_sync_acl,
+                    "ACL_DATA": hci_acl.parse_acl,
+                    "ACL_SYNC_DATA": hci_acl.parse_sync_acl,
                     "HCI_EVT": hci_evt.parse_evt}
 
 
