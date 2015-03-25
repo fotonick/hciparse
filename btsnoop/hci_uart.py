@@ -4,14 +4,20 @@
      ./hci_uart.py <data string>
 """
 import sys
+import struct
 
 
-# HCI Packet types for UART Transport layer
-# Core specification 4.1 [vol 4] Part A (Section 2) - Protocol
-HCI_CMD = 0x01
-ACL_DATA = 0x02
-ACL_SYNC_DATA = 0x03
-HCI_EVT = 0x04
+"""
+HCI Packet types for UART Transport layer
+Core specification 4.1 [vol 4] Part A (Section 2) - Protocol
+"""
+HCI_UART_PKT_TYPES = {
+    0x01 : "HCI_CMD",
+    0x02 : "ACL_DATA",
+    0x03 : "ACL_SYNC_DATA",
+    0x04 : "HCI_EVT"
+}
+
 
 def parse(data):
     """
@@ -32,22 +38,17 @@ def parse(data):
     Returns a tuple with the HCI type (the first byte) identified and
     converted to a string followed by the rest of the data.
     """
-    return ( _parse_type(ord(data[0])), data[1:] )
+    pkt_type = struct.unpack("<B", data[:1])[0]
+    return ( _parse_type(pkt_type), data[1:] )
 
-def _parse_type(type):
+
+def _parse_type(pkt_type):
     """
     Parse HCI packet types to a proper description string
     """
-    if type == HCI_CMD:
-        return "HCI_CMD"
-    elif type == ACL_DATA:
-        return "ACL_DATA"
-    elif type == ACL_SYNC_DATA:
-        return "ACL_SYNC_DATA"
-    elif type == HCI_EVT:
-        return "HCI_EVT"
-    else:
-        raise ValueError("Illegal HCI UART packet type")
+    assert pkt_type in [1, 2, 3, 4]
+    return HCI_UART_PKT_TYPES[pkt_type]
+
 
 def print_hdr():
     """
