@@ -9,10 +9,10 @@ OpCodes and names for HCI commands according to the Bluetooth specification
 
 OpCode is 2 bytes, of which OGF is the upper 6 bits and OCF is the lower 10 bits.
 
- 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5
----------------------------------
-|            opcode             |
----------------------------------
+ 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7 0 1 2 3 4 5 6 7
+-------------------------------------------------
+|            opcode             |    length     |
+-------------------------------------------------
 |        OCF        |    OGF    |
 ---------------------------------
 """
