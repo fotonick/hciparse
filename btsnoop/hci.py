@@ -12,11 +12,12 @@ import struct
 import hci_cmd
 import hci_evt
 import hci_acl
+import hci_sco
 
 
 PKT_TYPE_PARSERS = {"HCI_CMD": hci_cmd.parse_cmd,
                     "ACL_DATA": hci_acl.parse_acl,
-                    "ACL_SYNC_DATA": hci_acl.parse_sync_acl,
+                    "ACL_SYNC_DATA": hci_sco.parse_sco,
                     "HCI_EVT": hci_evt.parse_evt}
 
 
