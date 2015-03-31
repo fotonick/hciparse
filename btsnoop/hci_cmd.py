@@ -261,7 +261,7 @@ HCI_COMMANDS = {
             0xfd59 : "COMND VSC_BLE_ENERGY_INFO"
         }
 
-def parse_cmd(data):
+def parse(data):
     """
     Parse HCI command
 
@@ -277,3 +277,9 @@ def parse_cmd(data):
     opcode, length = struct.unpack("<HB", data[:3])
     data = data[3:]
     return opcode, length, data
+
+def cmd_to_str(opcode):
+      """
+      Return a string representing the opcode
+      """
+      return HCI_COMMANDS[opcode]

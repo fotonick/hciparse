@@ -29,7 +29,7 @@ class SCO_HEADER( ctypes.Union ):
                 ("asbyte", c_uint)]
 
 
-def parse_sco(data):
+def parse(data):
     """
     Parse HCI ACL data
 
@@ -47,8 +47,8 @@ def parse_sco(data):
     return (handle, ps, length, data[3:])
 
 
-def _parse_packet_status_flags(ps):
+def ps_to_str(ps):
     """
-    Get the packet status flag.
+    Return a string representing the packet status flag
     """
     assert ps in [0, 1, 2, 3]

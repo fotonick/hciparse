@@ -137,7 +137,7 @@ HCI_EVENTS = {
         }
 
 
-def parse_evt(data):
+def parse(data):
     """
     Parse HCI event data
 
@@ -160,3 +160,10 @@ def parse_evt(data):
         subevtcode = struct.unpack("<B", data[2:3])[0]
         length -= 1 # Subtrackt length of SubEvent code
         return evtcode, length, subevtcode, data[3:]
+
+
+def evt_to_str(evtcode):
+      """
+      Return a string representing the event code
+      """
+      return HCI_EVENTS[evtcode]

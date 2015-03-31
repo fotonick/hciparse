@@ -1,7 +1,5 @@
 """
   Parse hci uart information from binary string
-  usage:
-     ./hci_uart.py <data string>
 """
 import sys
 import struct
@@ -11,11 +9,17 @@ import struct
 HCI Packet types for UART Transport layer
 Core specification 4.1 [vol 4] Part A (Section 2) - Protocol
 """
+HCI_CMD = 0x01
+ACL_DATA = 0x02
+SCO_DATA = 0x03
+HCI_EVT = 0x04
+
+
 HCI_UART_PKT_TYPES = {
-    0x01 : "HCI_CMD",
-    0x02 : "ACL_DATA",
-    0x03 : "ACL_SYNC_DATA",
-    0x04 : "HCI_EVT"
+    HCI_CMD : "HCI_CMD",
+    ACL_DATA : "ACL_DATA",
+    SCO_DATA : "SCO_DATA",
+    HCI_EVT : "HCI_EVT"
 }
 
 
@@ -35,43 +39,15 @@ def parse(data):
     * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
     ** [vol 4] Part A (Section 2) Protocol
 
-    Returns a tuple with the HCI type (the first byte) identified and
-    converted to a string followed by the rest of the data.
+    Returns a tuple (pkt_type, data) with the HCI type and data.
     """
     pkt_type = struct.unpack("<B", data[:1])[0]
-    return ( _parse_type(pkt_type), data[1:] )
+    return ( pkt_type, data[1:] )
 
 
-def _parse_type(pkt_type):
+def type_to_str(pkt_type):
     """
-    Parse HCI packet types to a proper description string
+    Return a string representing the HCI packet type
     """
-    assert pkt_type in [1, 2, 3, 4]
+    assert pkt_type in [HCI_CMD, ACL_DATA, SCO_DATA, HCI_EVT]
     return HCI_UART_PKT_TYPES[pkt_type]
-
-
-def print_hdr():
-    """
-    Print the script header
-    """
-    print ""
-    print "##############################"
-    print "#                            #"
-    print "#    hci uart parser v0.1    #"
-    print "#                            #"
-    print "##############################"
-    print ""
-
-
-def main(data):
-    parse(data)
-    return 0
-
-
-if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print __doc__
-        sys.exit(1)
-
-    print_hdr()
-    sys.exit(main(sys.argv[1]))

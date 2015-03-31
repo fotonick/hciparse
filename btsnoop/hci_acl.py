@@ -36,7 +36,7 @@ PB_FLAGS = {
 }
 
 
-def parse_acl(data):
+def parse(data):
     """
     Parse HCI ACL data
 
@@ -55,9 +55,9 @@ def parse_acl(data):
     return (handle, pb, bc, length, data[4:])
 
 
-def _parse_packet_boundary_flags(pb):
+def pb_to_str(pb):
     """
-    Get the packet boundary flag.
+    Return a string representing the packet boundary flag
     """
     assert pb in [0, 1, 2, 3]
     return PB_FLAGS[pb]

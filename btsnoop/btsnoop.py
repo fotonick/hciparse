@@ -60,14 +60,11 @@ def parse(filename):
         (identification, version, type) = _read_file_header(f)
         _validate_file_header(identification, version, type)
 
-        # Parse the stuff we know at this time:
-        # * sequence nbr
-        # * record length (in bytes)
-        # * flags
-        # * timestamp
-        # * data
+        # Not using the following data:
+        # record[1] - original length
+        # record[4] - cumulative drops
         return map(lambda record: 
-            (record[0], record[2], _parse_flags(record[3]), _parse_time(record[5]), record[6]),
+            (record[0], record[2], record[3], _parse_time(record[5]), record[6]),
             _read_packet_records(f))
 
 
@@ -160,14 +157,6 @@ def _read_packet_records(f):
         seq_nbr += 1
 
 
-def _parse_flags(flags):
-    """
-    Returns a tuple of (src, dst, type)
-    """
-    assert flags in [0,1,2,3]
-    return BTSNOOP_FLAGS[flags]
-
-
 def _parse_time(time):
     """
     Record time is a 64-bit signed integer representing the time of packet arrival, 
@@ -180,6 +169,14 @@ def _parse_time(time):
     time_betw_0_and_2000_ad = int("0x00E03AB44A676000", 16)
     time_since_2000_epoch = datetime.timedelta(microseconds=time) - datetime.timedelta(microseconds=time_betw_0_and_2000_ad)
     return datetime.datetime(2000, 1, 1) + time_since_2000_epoch
+
+
+def flags_to_str(flags):
+    """
+    Returns a tuple of (src, dst, type)
+    """
+    assert flags in [0,1,2,3]
+    return BTSNOOP_FLAGS[flags]
 
 
 def print_hdr():
