@@ -20,11 +20,11 @@ L2CAP_CID_SMP = 0x0006
 
 
 L2CAP_CHANNEL_IDS = {
-	L2CAP_CID_NUL : "L2CAP_CID_NUL",
-	L2CAP_CID_SCH : "L2CAP_CID_SCH",
-	L2CAP_CID_ATT : "L2CAP_CID_ATT",
-	L2CAP_CID_LE_SCH : "L2CAP_CID_LE_SCH",
-	L2CAP_CID_SMP : "L2CAP_CID_SMP"
+	L2CAP_CID_NUL : "L2CAP CID_NUL",
+	L2CAP_CID_SCH : "L2CAP CID_SCH",
+	L2CAP_CID_ATT : "L2CAP CID_ATT",
+	L2CAP_CID_LE_SCH : "L2CAP CID_LE_SCH",
+	L2CAP_CID_SMP : "L2CAP CID_SMP"
 }
 
 
@@ -58,10 +58,10 @@ def parse_hdr(data):
     return length, cid, data
 
 
-PKT_TYPE_PARSERS = { hci_acl.START_NON_AUTO_L2CAP_PDU : parse_hdr,
-                     hci_acl.CONT_FRAG_MSG : parse_hdr,
-                     hci_acl.START_AUTO_L2CAP_PDU : parse_hdr,
-                     hci_acl.COMPLETE_L2CAP_PDU : parse_hdr }
+PKT_TYPE_PARSERS = { hci_acl.PB_START_NON_AUTO_L2CAP_PDU : parse_hdr,
+                     hci_acl.PB_CONT_FRAG_MSG : parse_hdr,
+                     hci_acl.PB_START_AUTO_L2CAP_PDU : parse_hdr,
+                     hci_acl.PB_COMPLETE_L2CAP_PDU : parse_hdr }
 
 
 def parse(l2cap_pkt_type, data):
