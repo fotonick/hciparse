@@ -2,7 +2,7 @@
 Parse L2CAP packets
 """
 import struct
-import hci_acl
+from . import hci_acl
 
 
 """
