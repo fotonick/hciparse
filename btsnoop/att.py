@@ -2,8 +2,7 @@
 Parse ATT packets
 """
 import struct
-import ctypes
-from ctypes import c_uint
+
 
 """
 ATT PDUs
