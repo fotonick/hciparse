@@ -14,6 +14,10 @@ bits broadcast flags.
 -----------------------------------------------------------------
 |            handle     |pb |bc |             length            |
 -----------------------------------------------------------------
+
+References can be found here:
+    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
+    ** [vol 2] Part E (Section 5.4.2) - HCI ACL Data Packets
 """
 class ACL_HEADER_BITS( ctypes.LittleEndianStructure ):
     _fields_ = [("handle",  c_uint,  12),
@@ -28,11 +32,25 @@ class ACL_HEADER( ctypes.Union ):
     _fields_ = [("b", ACL_HEADER_BITS),
                 ("asbyte", c_uint)]
 
+
+"""
+Packet Boundary flag
+
+References can be found here:
+    * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
+    ** [vol 2] Part E (Section 5.4.2) - HCI ACL Data Packets
+"""
+START_NON_AUTO_L2CAP_PDU = 0
+CONT_FRAG_MSG = 1
+START_AUTO_L2CAP_PDU = 2
+COMPLETE_L2CAP_PDU = 3
+
+
 PB_FLAGS = {
-    0 : "START_NON_AUTO_L2CAP PDU",
-    1 : "CONT_FRAG_MSG",
-    2 : "START_AUTO_L2CAP PDU",
-    3 : "COMPLETE_L2CAP_PDU"
+    START_NON_AUTO_L2CAP_PDU : "START_NON_AUTO_L2CAP_PDU",
+    CONT_FRAG_MSG : "CONT_FRAG_MSG",
+    START_AUTO_L2CAP_PDU : "START_AUTO_L2CAP_PDU",
+    COMPLETE_L2CAP_PDU : "COMPLETE_L2CAP_PDU"
 }
 
 

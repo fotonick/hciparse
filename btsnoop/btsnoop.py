@@ -47,7 +47,7 @@ def parse(filename):
     * http://tools.ietf.org/html/rfc1761
     * http://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
 
-    Return a list of records, each holding:
+    Return a list of records, each holding a tuple of:
     * sequence nbr
     * record length (in bytes)
     * flags
