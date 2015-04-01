@@ -18,11 +18,11 @@ Direction is relative to host / DTE. i.e. for Bluetooth controllers,
 Send is Host->Controller, Receive is Controller->Host
 """
 BTSNOOP_FLAGS = {
-    0 : ("host", "controller", "data"),
-    1 : ("controller", "host", "data"),
-    2 : ("host", "controller", "command"),
-    3 : ("controller", "host", "event")
-}
+        0 : ("host", "controller", "data"),
+        1 : ("controller", "host", "data"),
+        2 : ("host", "controller", "command"),
+        3 : ("controller", "host", "event")
+    }
 
 
 def parse(filename):
@@ -205,6 +205,3 @@ if __name__ == "__main__":
         
     print_hdr()
     sys.exit(main(sys.argv[1]))
-
-# vim: expandtab sw=4 ts=4
-

@@ -36,7 +36,7 @@ def parse(data):
     
     References can be found here:
         * https://www.bluetooth.org/en-us/specification/adopted-specifications - Core specification 4.1
-    	** [vol 3] Part H (Section 3.3) - Command Format
+        ** [vol 3] Part H (Section 3.3) - Command Format
 
     Return a tuple (code, data)
     """
@@ -44,7 +44,7 @@ def parse(data):
     return (code, data[1:])
 
 def code_to_str(code):
-	"""
-	Return a string representing the SMP code
-	"""
-	return SMP_PDUS[code]
+    """
+    Return a string representing the SMP code
+    """
+    return SMP_PDUS[code]
