@@ -27,6 +27,8 @@ The `bt` submodule contains functionality for parsing the Bluetooth data parsed 
 Usage
 -----
 
+### `android`
+
 Getting the btsnoop log from an android device
 
 ```python
@@ -54,3 +56,28 @@ You can also specify the output file
 >>> print filename
 /home/joekickass/tmp/mysnoop.log
 ```
+
+### `btsnoop`
+
+Parsing a btsnoop capture file
+
+```python
+>>> import os
+>>> import btsnoop.btsnoop.btsnoop as bts
+>>>
+>>> home = os.path.expanduser("~")
+>>> filename = os.path.join(home, 'tmp', 'mysnoop.log')
+>>>
+>>> records = bts.parse(filename)
+>>>
+>>> print len(records)
+24246
+>>> print records[0]
+(1, 4, 2, datetime.datetime(2015, 4, 2, 6, 29, 25, 914577), '\x01\x03\x0c\x00')
+>>> print records[24245]
+(1, 4, 2, datetime.datetime(2015, 4, 2, 6, 29, 25, 914577), '\x01\x03\x0c\x00')
+```
+
+### `bt`
+
+TODO
