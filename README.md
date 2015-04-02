@@ -102,9 +102,72 @@ Some of the information in a record can be printed as human readable strings
 >>> print timestamp
 2015-04-02 06:29:25.914577
 >>> print data
-
+'\x01\x03\x0c\x00'
 ```
 
 ### bt
 
-TODO
+This is the fun stuff. The data contained in a btsnoop record can be parsed using the `bt` submodule.
+
+Parse HCI UART type. This is the first byte of the payload. It tells us what type of HCI packet that is contained in the record.
+
+```python
+>>> import btsnoop.bt.hci_uart as hci_uart
+>>> import btsnoop.bt.hci as hci
+>>>
+>>> rec_data = '\x01\x03\x0c\x00'
+>>>
+>>> hci_type, data = hci_uart.parse(rec_data)
+>>>
+>>> print hci_type
+1
+>>> print data
+'\x03\x0c\x00'
+>>> print hci_uart.type_to_str(hci_type)
+HCI_CMD
+```
+
+Parse a HCI command packet. We need to specify HCI type as described in previous example.
+
+```python
+>>> import btsnoop.bt.hci as hci
+>>> import btsnoop.bt.hci_cmd as hci_cmd
+>>>
+>>> hci_type = 1
+>>> hci_data = '\x03\x0c\x00'
+>>>
+>>> opcode, length, data = hci.parse(hci_type, hci_data)
+>>> 
+>>> print opcode
+3075
+>>> print length
+0
+>>> print data
+
+>>> print hci_cmd.cmd_to_str(opcode)
+COMND Reset
+```
+
+Parse a HCI event packet. We need to specify HCI type as described in the uart example.
+
+```python
+>>> import btsnoop.bt.hci as hci
+>>> import btsnoop.bt.hci_evt as hci_evt
+>>>
+>>> hci_type = 4
+>>> hci_data = '\x13\x05\x01@\x00\x01\x00'
+>>>
+>>> ret = hci.parse(hci_type, hci_data)
+>>> print len(ret)
+3
+>>> 
+>>> evtcode, length, data = ret
+>>> print evtcode
+19
+>>> print length
+5
+>>> print data
+'\x01@\x00\x01\x00'
+>>> print hci_evt.evt_to_str(evtcode)
+EVENT Number_Of_Completed_Packets
+```
