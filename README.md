@@ -8,17 +8,17 @@ Documentation
 
 Specifications
 - BtSnoop format
--- http://tools.ietf.org/html/rfc1761
--- http://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
+	- http://tools.ietf.org/html/rfc1761
+	- http://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
 - Bluetooth specification
--- https://www.bluetooth.org/en-us/specification/adopted-specifications
+	- https://www.bluetooth.org/en-us/specification/adopted-specifications
 
 Module overview
 ---------------
 
 The `btsnoop` module contains three submodules; `android`, `bt` and `btsnoop`.
 
-The `android` submodule in turn contains functionality for connecting to, and fetching data from, an Android device. It requires an installation of the Android `adb` tool available in `PATH`.
+The `android` submodule contains functionality for connecting to, and fetching data from, an Android device. It requires an installation of the Android `adb` tool available in `PATH`.
 
 The `btsnoop` submodule contains functionality for parsing a btsnoop file.
 
