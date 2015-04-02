@@ -13,7 +13,7 @@ class Executor(object):
         """
         Executes the given command
 
-        Returns a tuple of (exit code, stdout)
+        Returns a tuple of (exit code, stdout+stderr)
         """
         ret = ''
         exit_code = 0
@@ -22,4 +22,5 @@ class Executor(object):
             ret = ret.rstrip()
         except subprocess.CalledProcessError as error:
             exit_code = error.returncode
+            ret = error.output.rstrip()
         return exit_code, ret
