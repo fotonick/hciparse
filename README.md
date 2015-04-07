@@ -127,7 +127,7 @@ Parse HCI UART type. This is the first byte of the payload. It tells us what typ
 HCI_CMD
 ```
 
-Parse a HCI command packet. We need to specify HCI type as described in previous example.
+Parse a HCI command packet. We need to specify HCI type as described in the HCI UART  example.
 
 ```python
 >>> import btsnoop.bt.hci as hci
@@ -148,7 +148,7 @@ Parse a HCI command packet. We need to specify HCI type as described in previous
 COMND Reset
 ```
 
-Parse a HCI event packet. We need to specify HCI type as described in the uart example.
+Parse a HCI event packet. We need to specify HCI type as described in the HCI UART example.
 
 ```python
 >>> import btsnoop.bt.hci as hci
@@ -170,4 +170,28 @@ Parse a HCI event packet. We need to specify HCI type as described in the uart e
 '\x01@\x00\x01\x00'
 >>> print hci_evt.evt_to_str(evtcode)
 EVENT Number_Of_Completed_Packets
+```
+
+Parse a HCI ACL packet. We need to specify HCI type as described in the HCI UART example.
+
+```python
+>>> import btsnoop.bt.hci as hci
+>>> import btsnoop.bt.hci_acl as hci_acl
+>>>
+>>> hci_type = 2
+>>> hci_data = '@ \x07\x00\x03\x00\x04\x00\x0b@\x04'
+>>>
+>>> ret = hci.parse(hci_type, hci_data)
+>>> print len(ret)
+5
+>>>
+>>> handle, pb, bc, length, data = ret
+>>> print handle
+64
+>>> print pb
+2
+>>> print data
+'\x00\x03\x00\x04\x00\x0b@\x04'
+>>> print hci_acl.pb_to_str(pb)
+ACL_PB START_AUTO_L2CAP_PDU
 ```
