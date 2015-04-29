@@ -6,10 +6,12 @@ from phone import Phone
 
 
 BTSTACK_CONFIG_FILE = 'bt_stack.conf'
-BTSTACK_CONFIG_PATH = os.path.join('/', 'etc', 'bluetooth', BTSTACK_CONFIG_FILE)
-
+# Needs to always be in UNIX format, hence no os.path.join
+BTSTACK_CONFIG_PATH = '/etc/bluetooth/' + BTSTACK_CONFIG_FILE
+ 
 BTSNOOP_FALLBACK_FILE = 'btsnoop_hci.log'
-BTSNOOP_FALLBACK_PATH = os.path.join('/', 'sdcard', BTSNOOP_FALLBACK_FILE)
+# Needs to always be in UNIX format, hence no os.path.join
+BTSNOOP_FALLBACK_PATH = '/sdcard/' + BTSNOOP_FALLBACK_FILE
 
 
 class SnoopPhone(Phone):
