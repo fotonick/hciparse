@@ -1,28 +1,32 @@
-btsnoop
+hciparse
 =======
 
-Parsing module for BtSnoop packet capture files and encapsulated Bluetooth packets
+Python parsing module for btsnoop and Apple PacketLogger packet capture files
+and encapsulated Bluetooth packets
+
+This project was forked from https://github.com/joekickass/btsnoop to add
+support for .pklg files.
 
 Documentation
 -------------
 
 Specifications
-- BtSnoop format
-	- http://tools.ietf.org/html/rfc1761
-	- http://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
+- btsnoop format
+	- https://tools.ietf.org/html/rfc1761
+	- https://www.fte.com/webhelp/NFC/Content/Technical_Information/BT_Snoop_File_Format.htm
 - Bluetooth specification
 	- https://www.bluetooth.org/en-us/specification/adopted-specifications
 
 Module overview
 ---------------
 
-The `btsnoop` module contains three submodules; `android`, `bt` and `btsnoop`.
+The `hciparse` module contains three submodules; `android`, `bt` and `logparse`.
 
 The `android` submodule contains functionality for connecting to, and fetching data from, an Android device. It requires an installation of the Android `adb` tool available in `PATH`.
 
-The `btsnoop` submodule contains functionality for parsing a btsnoop file.
+The `logparse` submodule contains functionality for parsing a btsnoop or packetlogger (.pklg) file.
 
-The `bt` submodule contains functionality for parsing the Bluetooth data parsed from the btsnoop file.
+The `bt` submodule contains functionality for parsing the Bluetooth data parsed from a capture.
 
 Usage
 -----
@@ -33,7 +37,7 @@ Getting the btsnoop log from an android device
 
 ```python
 >>> import os
->>> from btsnoop.android.snoopphone import SnoopPhone
+>>> from hciparse.android.snoopphone import SnoopPhone
 >>>
 >>> phone = SnoopPhone()
 >>> filename = phone.pull_btsnoop()
@@ -46,7 +50,7 @@ You can also specify the output file
 
 ```python
 >>> import os
->>> from btsnoop.android.snoopphone import SnoopPhone
+>>> from hciparse.android.snoopphone import SnoopPhone
 >>>
 >>> phone = SnoopPhone()
 >>> home = os.path.expanduser("~")
@@ -57,13 +61,13 @@ You can also specify the output file
 /home/joekickass/tmp/mysnoop.log
 ```
 
-### btsnoop
+### logparse
 
-Parsing a btsnoop capture file
+Parsing a btsnoop or pklg capture file
 
 ```python
 >>> import os
->>> import btsnoop.btsnoop.btsnoop as bts
+>>> import hciparse.logparse.logparse as bts
 >>>
 >>> home = os.path.expanduser("~")
 >>> filename = os.path.join(home, 'tmp', 'mysnoop.log')
@@ -81,7 +85,7 @@ Parsing a btsnoop capture file
 Some of the information in a record can be printed as human readable strings
 
 ```python
->>> import btsnoop.btsnoop.btsnoop as bts
+>>> import hciparse.logparse.logparse as bts
 ...
 >>> print len(records)
 24246
@@ -107,13 +111,13 @@ Some of the information in a record can be printed as human readable strings
 
 ### bt
 
-This is the fun stuff. The data contained in a btsnoop record can be parsed using the `bt` submodule.
+This is the fun stuff. The data contained in an HCI record can be parsed using the `bt` submodule.
 
 Parse HCI UART type. This is the first byte of the payload. It tells us what type of HCI packet that is contained in the record.
 
 ```python
->>> import btsnoop.bt.hci_uart as hci_uart
->>> import btsnoop.bt.hci as hci
+>>> import hciparse.bt.hci_uart as hci_uart
+>>> import hciparse.bt.hci as hci
 >>>
 >>> rec_data = '\x01\x03\x0c\x00'
 >>>
@@ -130,8 +134,8 @@ HCI_CMD
 Parse a HCI command packet. We need to specify HCI type as described in the HCI UART  example.
 
 ```python
->>> import btsnoop.bt.hci as hci
->>> import btsnoop.bt.hci_cmd as hci_cmd
+>>> import hciparse.bt.hci as hci
+>>> import hciparse.bt.hci_cmd as hci_cmd
 >>>
 >>> hci_type = 1
 >>> hci_data = '\x03\x0c\x00'
@@ -151,8 +155,8 @@ COMND Reset
 Parse a HCI event packet. We need to specify HCI type as described in the HCI UART example.
 
 ```python
->>> import btsnoop.bt.hci as hci
->>> import btsnoop.bt.hci_evt as hci_evt
+>>> import hciparse.bt.hci as hci
+>>> import hciparse.bt.hci_evt as hci_evt
 >>>
 >>> hci_type = 4
 >>> hci_data = '\x13\x05\x01@\x00\x01\x00'
@@ -175,8 +179,8 @@ EVENT Number_Of_Completed_Packets
 Parse a HCI ACL packet. We need to specify HCI type as described in the HCI UART example.
 
 ```python
->>> import btsnoop.bt.hci as hci
->>> import btsnoop.bt.hci_acl as hci_acl
+>>> import hciparse.bt.hci as hci
+>>> import hciparse.bt.hci_acl as hci_acl
 >>>
 >>> hci_type = 2
 >>> hci_data = '@ \x07\x00\x03\x00\x04\x00\x0b@\x04'
@@ -204,14 +208,14 @@ import binascii
 import string
 from prettytable import PrettyTable
 
-import btsnoop.btsnoop.btsnoop as btsnoop
-import btsnoop.bt.hci_uart as hci_uart
-import btsnoop.bt.hci_cmd as hci_cmd
-import btsnoop.bt.hci_evt as hci_evt
-import btsnoop.bt.hci_acl as hci_acl
-import btsnoop.bt.l2cap as l2cap
-import btsnoop.bt.att as att
-import btsnoop.bt.smp as smp
+import hciparse.logparse.logparse as logparse
+import hciparse.bt.hci_uart as hci_uart
+import hciparse.bt.hci_cmd as hci_cmd
+import hciparse.bt.hci_evt as hci_evt
+import hciparse.bt.hci_acl as hci_acl
+import hciparse.bt.l2cap as l2cap
+import hciparse.bt.att as att
+import hciparse.bt.smp as smp
 
 def get_rows(records):
 
@@ -277,7 +281,7 @@ def main(filename):
     table.aligns[3] = 'l'
     table.aligns[4] = 'l'
     
-    records = btsnoop.parse(filename)
+    records = logparse.parse(filename)
     rows = get_rows(records)
     [table.add_row(r) for r in rows]
 

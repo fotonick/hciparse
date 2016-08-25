@@ -4,7 +4,7 @@
 # TODO: Move stuff here to their corresponding modules
 #
 import binascii
-import btsnoop.btsnoop as bts
+import logparse.logparse as bts
 import bt.hci_cmd as hci_cmd
 import bt.hci_uart as hci_uart
 
