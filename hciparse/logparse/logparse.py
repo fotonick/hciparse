@@ -27,7 +27,7 @@ BTSNOOP_FLAGS = {
 
 def parse(filename):
     """
-    Parse a Btsnoop or pklg packet capture file.
+    Parse a pklg packet capture file.
 
     Btsnoop packet capture file is structured as:
 
@@ -60,23 +60,11 @@ def parse(filename):
         (identification, version, type) = _read_file_header(f)
         pklg_version2 = (identification[1] == b'\x01')
 
-        # Check for btsnoop magic, if it doesn't exist, might be PacketLogger
-        # format
-        if identification != b"btsnoop\0":
-            # Validate and rewind because PacketLogger files have no file header
-            _validate_is_packetlogger_file(identification)
-            f.seek(0)
-            # NEXT
-            return [(record[0], record[1], record[2], record[3], record[4]) for record in _read_packetlogger_records(f, pklg_version2)]
-
-        else:
-            _validate_btsnoop_header(identification, version, type)
-
-            # Not using the following data:
-            # record[1] - original length
-            # record[4] - cumulative drops
-            # seq_nbr, inc_len, flags, time64, data
-            return [(record[0], record[2], record[3], _parse_time(record[5]), record[6]) for record in _read_btsnoop_records(f)]
+        # Validate and rewind because PacketLogger files have no file header
+        _validate_is_packetlogger_file(identification)
+        f.seek(0)
+        # NEXT
+        return [(record[0], record[1], record[2], record[3], record[4]) for record in _read_packetlogger_records(f, pklg_version2)]
 
 
 def _read_file_header(f):
