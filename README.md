@@ -4,6 +4,8 @@ hciparse
 Python parsing module for btsnoop and Apple PacketLogger packet capture files
 and encapsulated Bluetooth packets
 
+This project was forked from https://github.com/regnirof/hciparse to upgrade for Python 3 and to allow parsing of .pklg during live capture.
+
 This project was forked from https://github.com/joekickass/btsnoop to add
 support for .pklg files.
 
