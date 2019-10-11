@@ -82,9 +82,7 @@ def parse_streaming(filename):
 
         # Read file header
         (identification, version, type) = _read_file_header(f)
-        # pklg_version2 = (identification[1] == b'\x01')
-        pklg_version2 = True
-        print(identification, version, type)
+        pklg_version2 = (identification[1] == b'\x01')
 
         # Validate and rewind because PacketLogger files have no file header
         _validate_is_packetlogger_file(identification)
@@ -188,7 +186,7 @@ def _read_btsnoop_records(f):
 
 def read_retry(f, length, retries):
     data = []
-    retries = 120
+    retries = 12000000
     where = f.tell()
     while True:
         data = f.read(length)
