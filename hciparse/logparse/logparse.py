@@ -5,6 +5,7 @@
 """
 import datetime
 import sys
+from time import sleep
 import struct
 
 
@@ -64,7 +65,32 @@ def parse(filename):
         _validate_is_packetlogger_file(identification)
         f.seek(0)
         # NEXT
-        return [(record[0], record[1], record[2], record[3], record[4]) for record in _read_packetlogger_records(f, pklg_version2)]
+        return list(_read_packetlogger_records(f, pklg_version2, live_capture=False))
+
+def parse_streaming(filename):
+    """
+    Parse a pklg packet capture file that's still being captured.
+
+    Return a generator of records, each holding a tuple of:
+    * sequence nbr
+    * record length (in bytes)
+    * flags
+    * timestamp
+    * data
+    """
+    with open(filename, "rb") as f:
+
+        # Read file header
+        (identification, version, type) = _read_file_header(f)
+        # pklg_version2 = (identification[1] == b'\x01')
+        pklg_version2 = True
+        print(identification, version, type)
+
+        # Validate and rewind because PacketLogger files have no file header
+        _validate_is_packetlogger_file(identification)
+        f.seek(0)
+        # NEXT
+        yield from _read_packetlogger_records(f, pklg_version2, live_capture=True)
 
 
 def _read_file_header(f):
@@ -160,22 +186,42 @@ def _read_btsnoop_records(f):
         yield ( seq_nbr, orig_len, inc_len, flags, drops, time64, data )
         seq_nbr += 1
 
+def read_retry(f, length, retries):
+    data = []
+    retries = 120
+    where = f.tell()
+    while True:
+        data = f.read(length)
+        if (len(data) == length) or (retries <= 0):
+            break
+        sleep(0.01)
+        f.seek(where)
+        retries -= 1
+    return data, retries
 
-def _read_packetlogger_records(f, pklg_version2):
-
+def _read_packetlogger_records(f, pklg_version2, live_capture=False):
+    if live_capture:
+        retries = 1000
+    else:
+        retries = 0
     seq_nbr = 1
     while True:
         # PacketLogger packet should be 4 byte len, 8 byte timestamp, 1 byte type
-        pkt = f.read(4 + 8 + 1)
-        if len(pkt) != 13:
+        pkt, retries_remaining = read_retry(f, 4 + 8 + 1, 120)
+        if retries_remaining <= 0:
+            print("exceeded pkt retries")
             break
+
         # PKLGv2 files are little endian
         if pklg_version2:
             length, timestamp, pkt_type = struct.unpack("<IqB", pkt)
         else:
             length, timestamp, pkt_type = struct.unpack(">IqB", pkt)
 
-        data = f.read(length - (13 - 4))
+        data, retries_remaining = read_retry(f, length - (13 - 4), 120)
+        if retries_remaining <= 0:
+            print("exceeded data retries")
+            break
 
         # This is not very clear, but the PacketLogger flags are different so we
         # translate them to the btsnoop flags. Also there are some special types
@@ -208,7 +254,6 @@ def _read_packetlogger_records(f, pklg_version2):
         timestamp = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=secs, microseconds=usecs)
         yield (seq_nbr, length, pkt_type, timestamp, data)
         seq_nbr += 1
-
 
 def _parse_time(time):
     """
